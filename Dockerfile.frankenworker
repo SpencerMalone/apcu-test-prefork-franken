@@ -1,0 +1,8 @@
+FROM dunglas/frankenphp
+
+RUN install-php-extensions \
+        apcu
+
+COPY worker.php /app/public/index.php
+
+ENV FRANKENPHP_CONFIG="worker ./public/index.php 5"

@@ -1,0 +1,32 @@
+FROM prog/php:0.1--php7-apache-alpine
+
+## install required php modules
+RUN image--php-add-mod cli iconv json mbstring pdo_mysql session sqlite3 tokenizer apcu
+
+## edit php config
+RUN image--php-config \
+   'expose_php=Off' \
+   'max_execution_time=10' \
+   'memory_limit=32M' \
+   'post_max_size=20M' \
+   'upload_max_filesize=20M' \
+   'date.timezone="Europe/Bratislava"'
+
+## enable required apache modules
+RUN image--apache-enable-mod deflate filter rewrite
+
+## set document root
+RUN image--set-docroot /app/public
+
+## set container's initialization script
+# RUN image--on-init \
+#    'chmod 777 /app/temp /app/log /app/sessions' \
+#    'if [ "$''{APP__DB_MIGRATIONS}" ]; then' \
+#    '	/app/bin/db-migrations $''{APP__DB_MIGRATIONS}' \
+#    'fi'
+
+## copy application into image, create necessary directories
+WORKDIR /app
+COPY index.php public/index.php
+
+EXPOSE 80
